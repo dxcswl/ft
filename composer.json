@@ -1,7 +1,6 @@
 {
     "name": "dxcswl/ft",
     "description": "我们需要一个核心驱动的类哦",
-    "license": "Apache-2.0",
     "authors": [
         {
             "name": "dxcswl",
@@ -9,8 +8,8 @@
         }
     ],
     "require": {
-        "ext-gd": "*"
-    }, 
+        "php": ">=5.4.0"
+	},
     "autoload": {
         "psr-4": {
             "dxcswl\\": "src"
