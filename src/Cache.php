@@ -6,7 +6,7 @@
 // +----------------------------------------------------------------------
 // | Author:  封疆 <dxcswl@163.com> QQ:84111804
 // +----------------------------------------------------------------------
-namespace think;
+namespace ft;
 
 use think\cache;
 /*
@@ -17,7 +17,7 @@ use think\cache;
  *
  *  返回  data数组
  */
-class FtCache
+class CCache
 {
     public function cache() {
 
