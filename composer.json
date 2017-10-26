@@ -15,7 +15,7 @@
         "php": ">=5.6.0"
     },
     "config": {
-        "preferred-install": "dist"
+        "preferred-install": "stable"
     },
     "autoload": {
         "psr-4": {
