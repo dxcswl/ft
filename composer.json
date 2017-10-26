@@ -12,7 +12,7 @@
         "ext-gd": "*"
     },
     "require-dev": {
-        "php": ">=5.6.0",
+        "php": ">=5.6.0"
     },
     "config": {
         "preferred-install": "dist"
