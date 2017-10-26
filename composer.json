@@ -1,0 +1,25 @@
+{
+    "name": "dxcswl/ft",
+    "description": "我们需要一个核心驱动的类哦",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "dxcswl",
+            "email": "dxcswl@163.com"
+        }
+    ],
+    "require": {
+        "ext-gd": "*"
+    },
+    "require-dev": {
+        "topthink/framework": "^5.0",
+    },
+    "config": {
+        "preferred-install": "dist"
+    },
+    "autoload": {
+        "psr-4": {
+            "think\\": "src"
+        }
+    }
+}
