@@ -8,7 +8,6 @@
 // +----------------------------------------------------------------------
 namespace ft;
 
-use think\cache;
 /*
  *  生成缓存
  *  name 缓存的名称
@@ -17,9 +16,8 @@ use think\cache;
  *
  *  返回  data数组
  */
-class CCache
-{
-    public function cache() {
+class Cache {
+    public function Cache() {
 
     }
 
