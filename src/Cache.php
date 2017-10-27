@@ -17,13 +17,14 @@ namespace ft;
  *  返回  data数组
  */
 class Cache {
-    public function Cache() {
+
+    public static function Cache() {
 
     }
 
-    public function setCache($name = '', $type = 0, $data = []) {
+    public static function setCache($name = '', $type = 0, $data = []) {
         if(count($data) > 1) {
-            return $this->__cache_add($name, $data);
+            return self::__cache_add($name, $data);
         } else {
             $parameters = '';
             $array = explode('-', $name);
@@ -33,29 +34,29 @@ class Cache {
                 $parameters = $array[1];
             }
             if($type == 1) {
-                \think\Loader::import('common.event.Cache', '', '.php');
+                \think\facade\Loader::import('common.event.Cache', '', '.php');
                 $Cache = new \Common\event\Cache;
                 if(method_exists(new \Common\Event\Cache, $names)) {
                     $datas = $Cache->$names($parameters);
                 }
             } elseif($type == 2) {
-                \think\Loader::import('common.event.Inlay', '', '.php');
+                \think\facade\Loader::import('common.event.Inlay', '', '.php');
                 $Inlay = new \Common\Event\Inlay;
                 if(method_exists(new \Common\Event\Inlay, $names)) {
                     $datas = $Inlay->$names($parameters);
                 }
             } elseif($name == 'web_dictionary') {
-                $datas = $this->__set_cache_sort($names); //加载权限已经菜单栏目
+                $datas = self::__set_cache_sort($names); //加载权限已经菜单栏目
             } elseif($name == 'web_article_classify') {
-                $datas = $this->__set_cache_sort($names); //加载权限已经菜单栏目
+                $datas = self::__set_cache_sort($names); //加载权限已经菜单栏目
             } elseif($name == 'web_permission_power') {
-                $datas = $this->__set_cache_sort($names); //加载权限已经菜单栏目
+                $datas = self::__set_cache_sort($names); //加载权限已经菜单栏目
             } elseif($names) {
-                $datas = $this->__set_cache($names); //加载权限已经菜单栏目
+                $datas = self::__set_cache($names); //加载权限已经菜单栏目
             } else {
 
             }
-            return $this->__cache_add($names, $datas);
+            return self::__cache_add($names, $datas);
         }
     }
 
@@ -67,15 +68,15 @@ class Cache {
      *
      *  返回  缓存数据
      */
-    public function getCache($name = '', $type = 0) {
-        $array = \think\Cache::get($name);
+    public static function getCache($name = '', $type = 0) {
+        $array = \think\facade\Cache::get($name);
         if(is_array($array)) {
             if(count($array, 1) < 1) {
-                $array = $this->setCache($name, $type);
+                $array = self::setCache($name, $type);
             }
         } else {
             if(strlen($array) < 1) {
-                $array = $this->SetCache($name, $type);
+                $array = self::SetCache($name, $type);
             }
         }
         return $array;
@@ -87,9 +88,9 @@ class Cache {
      *
      *  返回  data数组
      */
-    public function __cache_add($name = '', $data = '') {
+    public static function __cache_add($name = '', $data = '') {
         if($data) {
-            \think\Cache::set($name, $data);
+            \think\facade\Cache::set($name, $data);
         }
         return $data;
     }
@@ -101,8 +102,8 @@ class Cache {
      *
      *  返回  data数组
      */
-    public function rmCache($name = '') {
-        \think\Cache::set($name, '');
+    public static function rmCache($name = '') {
+        \think\facade\Cache::set($name, '');
     }
 
     /*
@@ -111,7 +112,7 @@ class Cache {
      *
      *  返回  data数组
      */
-    static public function __set_cache($name = '') {
+    public static function __set_cache($name = '') {
         $table = \think\Db::name($name);
         $list = $table->select();
         $newlist = [];
@@ -125,7 +126,7 @@ class Cache {
      *  以下其他缓存
      */
 
-    public function __set_cache_sort($name = '') {
+    public static function __set_cache_sort($name = '') {
         $table = \think\Db::name($name);
         $list = $table->order('sort desc')->select();
 

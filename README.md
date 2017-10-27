@@ -24,12 +24,12 @@ https://github.com/dxcswl/ft
 
     示例： 缓存 表 (前缀)user表，整个表缓存，key为自增字段
 		
-    \ft\CCache::setCache('user');
+    \ft\Cache::setCache('user');
 		
     GetCache 同上  主要获取缓存的数据
 
     建议使用 
-        \ft\CCache::setetCache('demo',1);
+        \ft\Cache::setetCache('demo',1);
         增加 common/Event/Cache.php demo的方法
 	
   2.核心方法

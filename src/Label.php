@@ -1,6 +1,4 @@
 <?php
-
-namespace ft;
 // +----------------------------------------------------------------------
 // | Future [ 追寻最初的梦想 ]
 // +----------------------------------------------------------------------
@@ -8,6 +6,7 @@ namespace ft;
 // +----------------------------------------------------------------------
 // | Author:  封疆 <dxcswl@163.com> QQ:84111804
 // +----------------------------------------------------------------------
+namespace ft;
 class Label {
     /*
      * 生成指定大小的图片
@@ -45,8 +44,8 @@ class Label {
             if(!is_file($urls)) { //检查原始图片是否存在
                 return $url;
             }
-            $image = \think\Image::open($urls);//打开处理图片
-            $image->thumb($w, $h, \think\Image::THUMB_CENTER)->save($_SERVER['DOCUMENT_ROOT'] . $thumbimg, null, 90);//居中截取 生成90的质量
+            $image = \think\facade\Image::open($urls);//打开处理图片
+            $image->thumb($w, $h, \think\facade\Image::THUMB_CENTER)->save($_SERVER['DOCUMENT_ROOT'] . $thumbimg, null, 90);//居中截取 生成90的质量
             return $thumbimg;
         } else {
             return $url;
@@ -146,7 +145,7 @@ class Label {
             return false;
         } else {
             $where['id'] = $id;
-            return \think\Db::name('web_article')->where($where)->field($name)->find();
+            return \think\facade\Db::name('web_article')->where($where)->field($name)->find();
         }
     }
 
@@ -159,7 +158,7 @@ class Label {
      *  order 排序
      */
     public static function getArticleList($where = [], $limit = 10, $field = [], $order = '') {
-        return \think\Db::name('web_article')->where($where)->order($order)->field($field)->limit($limit)->find();
+        return \think\facade\Db::name('web_article')->where($where)->order($order)->field($field)->limit($limit)->find();
     }
 
     /*
@@ -174,7 +173,7 @@ class Label {
         if($id) {
             $where['classify_id'] = $id;
         }
-        return \think\Db::name('web_article')->where($where)->order('rand()')->field($field)->limit($limit)->select();
+        return \think\facade\Db::name('web_article')->where($where)->order('rand()')->field($field)->limit($limit)->select();
     }
 
     /*
@@ -206,7 +205,7 @@ class Label {
                 }
             }
         }
-        $tables = \think\Db::name($array['table']);
+        $tables = \think\facade\Db::name($array['table']);
         //设置不存在分类处理
         if(!isset($array['limit'])) {
             $array['limit'] = 10;
@@ -219,7 +218,7 @@ class Label {
             } else {
                 $count = $tables->where($array['where'])->field($array['field'])->order($array['order'])->count(); // 查询满足要求的总记录数
                 $data['pagesql'] = $tables->getLastSql();
-                $Page = new \think\Pagegm($count, $array['limit']); // 实例化分页类 传入总记录数和每页显示的记录数(25)
+                $Page = new \think\facade\Pagegm($count, $array['limit']); // 实例化分页类 传入总记录数和每页显示的记录数(25)
                 $show = $Page->show(); // 分页显示输出// 进行分页数据查询 注意limit方法的参数要使用Page类的属性
                 $list = $tables->where($array['where'])->field($array['field'])->order($array['order'])->group($array['group'])->limit($Page->firstRow . ',' . $Page->listRows)->select();
                 $data['page'] = $show;
@@ -228,52 +227,6 @@ class Label {
         $data['listsql'] = $tables->getLastSql();
         $data['list'] = $list;
         return $data;
-    }
-
-    /* 限制IP测试
-     * HOST访问限制 支持 IP(单IP,多IP,*通配符,IP段) 域名(单域名,多域名,*通配符)
-     * 根据判断实现IP地址 白名单黑名单
-     * @param unknown $host 当前host 127.0.0.2
-     * @param unknown $list 允许的host列表 127.0.0.*,192.168.1.1,192.168.1.70,127.1.1.33-127.1.1.100
-     * @return boolean
-     */
-    public static function getInHost($host = '', $list = '') {
-        $list = ',' . $list . ',';
-        //$is_in = false;
-        // 1.判断最简单的情况
-        $is_in = strpos($list, ',' . $host . ',') === false ? false : true;
-        // 2.判断通配符情况
-        if(!$is_in && strpos($list, '*') !== false) {
-            //$hosts = [];
-            $hosts = explode('.', $host);
-            // 组装每个 * 通配符的情况
-            foreach($hosts as $k1 => $v1) {
-                $host_now = '';
-                foreach($hosts as $k2 => $v2) {
-                    $host_now .= ($k2 == $k1 ? '*' : $v2) . '.';
-                }
-                // 组装好后进行判断
-                if(strpos($list, ',' . substr($host_now, 0, -1) . ',') !== false) {
-                    $is_in = true;
-                    break;
-                }
-            }
-        }
-        // 3.判断IP段限制
-        if(!$is_in && strpos($list, '-') !== false) {
-            $lists = explode(',', trim($list, ','));
-            $host_long = ip2long($host);
-            foreach($lists as $k => $v) {
-                if(strpos($v, '-') !== false) {
-                    list ($host1, $host2) = explode('-', $v);
-                    if($host_long >= ip2long($host1) && $host_long <= ip2long($host2)) {
-                        $is_in = true;
-                        break;
-                    }
-                }
-            }
-        }
-        return $is_in;
     }
 
     /**
@@ -305,53 +258,6 @@ class Label {
             $tmp[$value[$field]] = $value;
         }
         return $tmp;
-    }
-
-    /**
-     * 格式化时间
-     * @param int $time 时间戳
-     * @return string
-     */
-    public static function getFormatDate($time = 'default') {
-        $date = $time == 'default' ? date('Y-m-d H:i:s', time()) : date('Y-m-d H:i:s', $time);
-        return $date;
-    }
-
-    /*
-     * 获取是否手机端访问
-     */
-    public static function getIsMobile() {
-        // 如果有HTTP_X_WAP_PROFILE则一定是移动设备
-        if(isset ($_SERVER['HTTP_X_WAP_PROFILE'])) {
-            return true;
-        }
-
-        //此条摘自TPM智能切换模板引擎，适合TPM开发
-        if(isset ($_SERVER['HTTP_CLIENT']) && 'PhoneClient' == $_SERVER['HTTP_CLIENT']) {
-            return true;
-        }
-        //如果via信息含有wap则一定是移动设备,部分服务商会屏蔽该信息
-        if(isset ($_SERVER['HTTP_VIA'])) //找不到为flase,否则为true
-        {
-            return stristr($_SERVER['HTTP_VIA'], 'wap') ? true : false;
-        }
-        //判断手机发送的客户端标志,兼容性有待提高
-        if(isset ($_SERVER['HTTP_USER_AGENT'])) {
-            $clientkeywords = ['nokia', 'sony', 'ericsson', 'mot', 'samsung', 'htc', 'sgh', 'lg', 'sharp', 'sie-', 'philips', 'panasonic', 'alcatel', 'lenovo', 'iphone', 'ipod', 'blackberry', 'meizu', 'android', 'netfront', 'symbian', 'ucweb', 'windowsce', 'palm', 'operamini', 'operamobi', 'openwave', 'nexusone', 'cldc', 'midp', 'wap', 'mobile'];
-            //从HTTP_USER_AGENT中查找手机浏览器的关键字
-            if(preg_match("/(" . implode('|', $clientkeywords) . ")/i", strtolower($_SERVER['HTTP_USER_AGENT']))) {
-                return true;
-            }
-        }
-        //协议法，因为有可能不准确，放到最后判断
-        if(isset ($_SERVER['HTTP_ACCEPT'])) {
-            // 如果只支持wml并且不支持html那一定是移动设备
-            // 如果支持wml和html但是wml在html之前则是移动设备
-            if((strpos($_SERVER['HTTP_ACCEPT'], 'vnd.wap.wml') !== false) && (strpos($_SERVER['HTTP_ACCEPT'], 'text/html') === false || (strpos($_SERVER['HTTP_ACCEPT'], 'vnd.wap.wml') < strpos($_SERVER['HTTP_ACCEPT'], 'text/html')))) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /*
@@ -422,29 +328,6 @@ class Label {
         return $dir1 . '/' . $dir2 . '/' . $dir3 . '/' . substr($uid, -2) . "_avatar_$size.jpg";
     }
 
-    /**
-     * 获取当前访问的浏览器
-     */
-
-    public static function getBrowser() {
-        $agent = $_SERVER['HTTP_USER_AGENT'];
-        if(strpos($agent, 'MicroMessenger') !== false) {
-            return 'weixin';
-        } else if(strpos($agent, 'MSIE') !== false || strpos($agent, 'rv:11.0')) { //ie11判断
-            return "ie";
-        } else if(strpos($agent, 'Firefox') !== false) {
-            return "firefox";
-        } else if(strpos($agent, 'Chrome') !== false) {
-            return "chrome";
-        } else if(strpos($agent, 'Opera') !== false) {
-            return 'opera';
-        } else if((strpos($agent, 'Chrome') == false) && strpos($agent, 'Safari') !== false) {
-            return 'safari';
-        } else {
-            return 'unknown';
-        }
-    }
-
     /*
      *  处理表中 层级的关系  将关系写入 parents 中
      *  name 表名
@@ -458,7 +341,7 @@ class Label {
         }
         if(count($list) < 1) {
             $list = [];
-            $lists = \think\Db::name($name)->select();
+            $lists = \think\facade\Db::name($name)->select();
             foreach($lists as $keyl => $vl) {
                 $list[$vl[$pk]] = $vl;
             }
@@ -480,36 +363,9 @@ class Label {
         }
 
         foreach($array as $key => $v) {
-            \think\Db::name($name)->where([$pk => $key])->update(['parents' => implode(',', $v)]);
+            \think\facade\Db::name($name)->where([$pk => $key])->update(['parents' => implode(',', $v)]);
         }
     }
 
-    /*
-     *  获取指定url  顶级域名  不带有http://
-     *  httpurl 需要处理的url
-     *  type 是否包含www  1.去掉www  默认: 不去掉
-     */
-    public static function getParseHost($httpurl = '', $type = '') {
-        $httpurl = strtolower(trim($httpurl));
-        if(empty($httpurl)) {
-            return;
-        }
-        $regx1 = '/https?:\/\/(([^\/\?#]+\.)?([^\/\?#-\.]+\.)(com\.cn|org\.cn|net\.cn|com\.jp|co\.jp|com\.kr|com\.tw)(\:[0-9]+)?)/i';
-        $regx2 = '/https?:\/\/(([^\/\?#]+\.)?([^\/\?#-\.]+\.)(cn|com|org|net|cc|biz|hk|jp|kr|name|me|tw|la)(\:[0-9]+)?)/i';
-        $host = $tophost = '';
-        if(preg_match($regx1, $httpurl, $matches)) {
-            $host = $matches[1];
-        } elseif(preg_match($regx2, $httpurl, $matches)) {
-            $host = $matches[1];
-        }
-        if($matches) {
-            $tophost = $matches[2] == 'www.' ? $host : $matches[3] . $matches[4] . $matches[5];
-        }
-        if($type == 1) {
-            return trim($host, 'www.');
-        } else {
-            return [$host, $tophost];
-        }
 
-    }
 }
