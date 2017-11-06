@@ -54,7 +54,9 @@ class Cache {
             } elseif($names) {
                 $datas = self::__set_cache($names); //加载权限已经菜单栏目
             } else {
-
+                \think\facade\Cache::remember($names,function(){
+                    return '';
+                });
             }
             return self::__cache_add($names, $datas);
         }
@@ -113,13 +115,18 @@ class Cache {
      *  返回  data数组
      */
     public static function __set_cache($name = '') {
-        $table = \think\Db::name($name);
-        $list = $table->select();
-        $newlist = [];
-        foreach($list as $v) {
-            $newlist[$v[$table->getPk()]] = $v;
+        $isTable = \think\Db::query('SHOW TABLES LIKE "'.$name.'"');
+        if( $isTable ){
+            $table = \think\Db::name($name);
+            $list = $table->select();
+            $newlist = [];
+            foreach($list as $v) {
+                $newlist[$v[$table->getPk()]] = $v;
+            }
+            return $newlist;
+        }else{
+            return false;
         }
-        return $newlist;
     }
 
     /*
