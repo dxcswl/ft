@@ -45,16 +45,12 @@ class Cache {
                 if(method_exists(new \Common\Event\Inlay, $names)) {
                     $datas = $Inlay->$names($parameters);
                 }
-            } elseif($name == 'web_dictionary') {
-                $datas = self::__set_cache_sort($names); //加载权限已经菜单栏目
-            } elseif($name == 'web_article_classify') {
-                $datas = self::__set_cache_sort($names); //加载权限已经菜单栏目
-            } elseif($name == 'web_permission_power') {
+            } elseif($type == 3) {
                 $datas = self::__set_cache_sort($names); //加载权限已经菜单栏目
             } elseif($names) {
                 $datas = self::__set_cache($names); //加载权限已经菜单栏目
             } else {
-                \think\facade\Cache::remember($names,function(){
+                \think\facade\Cache::remember($names, function() {
                     return '';
                 });
             }
@@ -115,8 +111,8 @@ class Cache {
      *  返回  data数组
      */
     public static function __set_cache($name = '') {
-        $isTable = \think\Db::query('SHOW TABLES LIKE "'.$name.'"');
-        if( $isTable ){
+        $isTable = \think\Db::query('SHOW TABLES LIKE "' . $name . '"');
+        if($isTable) {
             $table = \think\Db::name($name);
             $list = $table->select();
             $newlist = [];
@@ -124,7 +120,7 @@ class Cache {
                 $newlist[$v[$table->getPk()]] = $v;
             }
             return $newlist;
-        }else{
+        } else {
             return false;
         }
     }
@@ -136,17 +132,6 @@ class Cache {
     public static function __set_cache_sort($name = '') {
         $table = \think\Db::name($name);
         $list = $table->order('sort desc')->select();
-
-        $newlist = [];
-        foreach($list as $v) {
-            if(isset($v['data'])) {
-                $v['datas'] = json_decode($v['data'], true);
-            } else {
-                $v['datas'] = [];
-            }
-            $newlist[$v[$table->getPk()]] = $v;
-        }
-
-        return $newlist;
+        return $list;
     }
 }

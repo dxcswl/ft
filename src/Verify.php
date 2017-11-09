@@ -13,7 +13,7 @@ class Verify {
     /**
      * 是否为空值
      */
-    public static function isEmpty($str = false) {
+    private function isEmpty($str = false) {
         $str = trim($str);
         return !empty($str) ? true : false;
     }
@@ -23,10 +23,10 @@ class Verify {
      * param:$flag : int是否是整数，float是否是浮点型
      */
     public static function isNum($str, $flag = 'float') {
-        if (!self::isEmpty($str)) {
+        if(!self::isEmpty($str)) {
             return false;
         }
-        if (strtolower($flag) == 'int') {
+        if(strtolower($flag) == 'int') {
             return ((string)(int)$str === (string)$str) ? true : false;
         } else {
             return ((string)(float)$str === (string)$str) ? true : false;
@@ -40,10 +40,10 @@ class Verify {
      * @param:$charset 编码（默认utf-8,支持gb2312）
      */
     public static function isName($str, $chinese = true, $charset = 'utf-8') {
-        if (!self::isEmpty($str)) {
+        if(!self::isEmpty($str)) {
             return false;
         }
-        if ($chinese) {
+        if($chinese) {
             $match = (strtolower($charset) == 'gb2312') ? "/^[" . chr(0xa1) . "-" . chr(0xff) . "A-Za-z0-9_-]+$/" : "/^[x{4e00}-x{9fa5}A-Za-z0-9_]+$/u";
         } else {
             $match = '/^[A-za-z0-9_-]+$/';
@@ -55,7 +55,7 @@ class Verify {
      * 邮箱验证
      */
     public static function isEmail($str) {
-        if (!self::isEmpty($str)) {
+        if(!self::isEmpty($str)) {
             return false;
         }
         return preg_match("/([a-z0-9]*[-_\.]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\.][a-z]{2,3}([\.][a-z]{2})?/i", $str) ? true : false;
@@ -64,17 +64,27 @@ class Verify {
     //手机号码验证
     public static function isMobile($str) {
         $exp = "/^13[0-9]{1}[0-9]{8}$|15[012356789]{1}[0-9]{8}$|18[012356789]{1}[0-9]{8}$|14[57]{1}[0-9]$/";
-        if (preg_match($exp, $str)) {
+        if(preg_match($exp, $str)) {
             return true;
         } else {
             return false;
         }
     }
 
+
+    /**
+     * 检查手机号是否合法
+     * @param string $mobile
+     * @return boolean
+     */
+    public static function isValidMobile($mobile) {
+        return (preg_match("#^1\d{10}$#", $mobile) ? true : false);
+    }
+
     //手机号码验证
     public static function isMobiles($str) {
         $exp = "/^1[0-9]{10}/";
-        if (preg_match($exp, $str)) {
+        if(preg_match($exp, $str)) {
             return true;
         } else {
             return false;
@@ -85,7 +95,7 @@ class Verify {
      * URL验证，纯网址格式，不支持IP验证
      */
     public static function isUrl($str) {
-        if (!self::isEmpty($str)) {
+        if(!self::isEmpty($str)) {
             return false;
         }
         return preg_match('#(http|https|ftp|ftps)://([w-]+.)+[w-]+(/[w-./?%&=]*)?#i', $str) ? true : false;
@@ -97,11 +107,10 @@ class Verify {
      * @param:$charset 编码（默认utf-8,支持gb2312）
      */
     public static function isChinese($str, $charset = 'utf-8') {
-        if (!self::isEmpty($str)) {
+        if(!self::isEmpty($str)) {
             return false;
         }
-        $match = (strtolower($charset) == 'gb2312') ? "/^[" . chr(0xa1) . "-" . chr(0xff) . "]+$/"
-            : "/^[x{4e00}-x{9fa5}]+$/u";
+        $match = (strtolower($charset) == 'gb2312') ? "/^[" . chr(0xa1) . "-" . chr(0xff) . "]+$/" : "/^[x{4e00}-x{9fa5}]+$/u";
         return preg_match($match, $str) ? true : false;
     }
 
@@ -109,7 +118,7 @@ class Verify {
      * UTF-8验证
      */
     public static function isUtf8($str) {
-        if (!self::isEmpty($str)) {
+        if(!self::isEmpty($str)) {
             return false;
         }
         return (preg_match("/^([" . chr(228) . "-" . chr(233) . "]{1}[" . chr(128) . "-" . chr(191) . "]{1}[" . chr(128) . "-" . chr(191) . "]{1}){1}/", $str) == true || preg_match("/([" . chr(228) . "-" . chr(233) . "]{1}[" . chr(128) . "-" . chr(191) . "]{1}[" . chr(128) . "-" . chr(191) . "]{1}){1}$/", $str) == true || preg_match("/([" . chr(228) . "-" . chr(233) . "]{1}[" . chr(128) . "-" . chr(191) . "]{1}[" . chr(128) . "-" . chr(191) . "]{1}){2,}/", $str) == true) ? true : false;
@@ -123,11 +132,11 @@ class Verify {
      * @param: string $charset 字符
      */
     public static function length($str, $type = 3, $min = 0, $max = 0, $charset = 'utf-8') {
-        if (!self::isEmpty($str)) {
+        if(!self::isEmpty($str)) {
             return false;
         }
         $len = mb_strlen($str, $charset);
-        switch ($type) {
+        switch($type) {
             case 1: //只匹配最小值
                 return ($len >= $min) ? true : false;
                 break;
@@ -148,7 +157,7 @@ class Verify {
     public static function isPWD($value, $minLen = 6, $maxLen = 16) {
         $match = '/^[\\~!@#$%^&*()-_=+|{}\[\],.?\/:;\'\"\d\w]{' . $minLen . ',' . $maxLen . '}$/';
         $v = trim($value);
-        if (empty($v)) {
+        if(empty($v)) {
             return false;
         }
         return preg_match($match, $v);
@@ -161,10 +170,10 @@ class Verify {
      * @return boolean
      */
     public static function isNames($value, $minLen = 2, $maxLen = 16, $charset = 'ALL') {
-        if (empty($value)) {
+        if(empty($value)) {
             return false;
         }
-        switch ($charset) {
+        switch($charset) {
             case 'EN':
                 $match = '/^[_\w\d]{' . $minLen . ',' . $maxLen . '}$/iu';
                 break;
@@ -182,10 +191,10 @@ class Verify {
      * @param string $value
      */
     public static function checkZip($str) {
-        if (strlen($str) != 6) {
+        if(strlen($str) != 6) {
             return false;
         }
-        if (substr($str, 0, 1) == 0) {
+        if(substr($str, 0, 1) == 0) {
             return false;
         }
         return true;
@@ -197,8 +206,8 @@ class Verify {
      */
     public static function checkDate($str) {
         $dateArr = explode("-", $str);
-        if (is_numeric($dateArr[0]) && is_numeric($dateArr[1]) && is_numeric($dateArr[2])) {
-            if (($dateArr[0] >= 1000 && $timeArr[0] <= 10000) && ($dateArr[1] >= 0 && $dateArr[1] <= 12) && ($dateArr[2] >= 0 && $dateArr[2] <= 31)) {
+        if(is_numeric($dateArr[0]) && is_numeric($dateArr[1]) && is_numeric($dateArr[2])) {
+            if(($dateArr[0] >= 1000 && $dateArr[0] <= 10000) && ($dateArr[1] >= 0 && $dateArr[1] <= 12) && ($dateArr[2] >= 0 && $dateArr[2] <= 31)) {
                 return true;
             } else {
                 return false;
@@ -213,8 +222,8 @@ class Verify {
      */
     public static function checkTime($str) {
         $timeArr = explode(":", $str);
-        if (is_numeric($timeArr[0]) && is_numeric($timeArr[1]) && is_numeric($timeArr[2])) {
-            if (($timeArr[0] >= 0 && $timeArr[0] <= 23) && ($timeArr[1] >= 0 && $timeArr[1] <= 59) && ($timeArr[2] >= 0 && $timeArr[2] <= 59)) {
+        if(is_numeric($timeArr[0]) && is_numeric($timeArr[1]) && is_numeric($timeArr[2])) {
+            if(($timeArr[0] >= 0 && $timeArr[0] <= 23) && ($timeArr[1] >= 0 && $timeArr[1] <= 59) && ($timeArr[2] >= 0 && $timeArr[2] <= 59)) {
                 return true;
             } else {
                 return false;
@@ -223,12 +232,53 @@ class Verify {
         return false;
     }
 
-    /**
-     * 检查手机号是否合法
-     * @param string $mobile
-     * @return boolean
-     */
-    function isValidMobile($mobile) {
-        return (preg_match("#^1\d{10}$#", $mobile) ? true : false);
+    public static function is_idcard($id) {
+        $id = strtoupper($id);
+        $regx = "/(^\d{15}$)|(^\d{17}([0-9]|X)$)/";
+        $arr_split = [];
+        if(!preg_match($regx, $id)) {
+            return false;
+        }
+        if(15 == strlen($id)) //检查15位
+        {
+            $regx = "/^(\d{6})+(\d{2})+(\d{2})+(\d{2})+(\d{3})$/";
+
+            @preg_match($regx, $id, $arr_split);
+            //检查生日日期是否正确
+            $dtm_birth = "19" . $arr_split[2] . '/' . $arr_split[3] . '/' . $arr_split[4];
+            if(!strtotime($dtm_birth)) {
+                return false;
+            } else {
+                return true;
+            }
+        } else      //检查18位
+        {
+            $regx = "/^(\d{6})+(\d{4})+(\d{2})+(\d{2})+(\d{3})([0-9]|X)$/";
+            @preg_match($regx, $id, $arr_split);
+            $dtm_birth = $arr_split[2] . '/' . $arr_split[3] . '/' . $arr_split[4];
+            if(!strtotime($dtm_birth)) //检查生日日期是否正确
+            {
+                return false;
+            } else {
+                //检验18位身份证的校验码是否正确。
+                //校验位按照ISO 7064:1983.MOD 11-2的规定生成，X可以认为是数字10。
+                $arr_int = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
+                $arr_ch = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'];
+                $sign = 0;
+                for($i = 0; $i < 17; $i++) {
+                    $b = (int)$id{$i};
+                    $w = $arr_int[$i];
+                    $sign += $b * $w;
+                }
+                $n = $sign % 11;
+                $val_num = $arr_ch[$n];
+                if($val_num != substr($id, 17, 1)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+
     }
 }
