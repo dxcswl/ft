@@ -22,40 +22,52 @@ class Cache {
 
     }
 
-    public static function setCache($name = '', $type = 0, $data = []) {
-        if(count($data) > 1) {
-            return self::__cache_add($name, $data);
-        } else {
-            $parameters = '';
-            $array = explode('-', $name);
-            $names = $array[0];
-            $datas = [];
-            if(empty($array[1]) != true) {
-                $parameters = $array[1];
+    /*
+     * setCaches('user')  缓存user表中数据
+     * setCaches('user',['id'=>1,'name'=>'你好！']) //缓存data 数据
+     *
+     * type
+     *      1. 缓存自由定义的数据 如:setCaches('user-1',[],3)
+     *      3. 缓存user表中数据 按照 sort 字段排序  如:setCaches('user',[],3)
+     *
+     *      其他默认返回 flash
+     */
+
+
+    public static function setCache($name = '', $data = [], $type = 0) {
+        if($type == 0){
+            if($data) {
+                return self::__cache_add($name, $data);
+            }else{
+                $ret_list = self::__set_cache($name); //加载表中数据
             }
+        }else{
             if($type == 1) {
-                \think\facade\Loader::import('common.event.Cache', '', '.php');
-                $Cache = new \Common\event\Cache;
-                if(method_exists(new \Common\Event\Cache, $names)) {
-                    $datas = $Cache->$names($parameters);
-                }
-            } elseif($type == 2) {
-                \think\facade\Loader::import('common.event.Inlay', '', '.php');
-                $Inlay = new \Common\Event\Inlay;
-                if(method_exists(new \Common\Event\Inlay, $names)) {
-                    $datas = $Inlay->$names($parameters);
+                $require = require_once(\think\facade\Env::get('app_path').'/common/common/Cache.php');
+                if($require){
+                    $array = explode('-', $name);
+                    if(empty($array[1]) != true) {
+                        $parameters = $array[1];
+                    }
+                    $name = $array[0];
+                    $Cache = new \common\common\Cache;
+                    if(method_exists($Cache, $name)) {
+                        $ret_list = $Cache->$name($parameters);
+                    }else{
+                        $ret_list = false;
+                    }
+                }else{
+                    $ret_list = false;
                 }
             } elseif($type == 3) {
-                $datas = self::__set_cache_sort($names); //加载权限已经菜单栏目
-            } elseif($names) {
-                $datas = self::__set_cache($names); //加载权限已经菜单栏目
-            } else {
-                \think\facade\Cache::remember($names, function() {
-                    return '';
+                $ret_list = self::__set_cache_sort($name); //读取$name表中的数据 数据中包含 sort
+            }else {
+                \think\facade\Cache::remember($name, function() {
+                    return false;
                 });
             }
-            return self::__cache_add($names, $datas);
         }
+        return $ret_list;
     }
 
     /*
@@ -68,13 +80,15 @@ class Cache {
      */
     public static function getCache($name = '', $type = 0) {
         $array = \think\facade\Cache::get($name);
-        if(is_array($array)) {
-            if(count($array, 1) < 1) {
-                $array = self::setCache($name, $type);
-            }
-        } else {
-            if(strlen($array) < 1) {
-                $array = self::SetCache($name, $type);
+        if($type > 0){
+            if(is_array($array)) {
+                if(count($array, 1) < 1) {
+                    $array = self::setCache($name,[], $type);
+                }
+            } else {
+                if(strlen($array) < 1) {
+                    $array = self::SetCache($name,[], $type);
+                }
             }
         }
         return $array;
@@ -86,11 +100,18 @@ class Cache {
      *
      *  返回  data数组
      */
-    public static function __cache_add($name = '', $data = '') {
+    public static function __cache_add($name = '', $data = '', $time = '2592000') {
         if($data) {
-            \think\facade\Cache::set($name, $data);
+            \think\facade\Cache::set($name, $data, $time);
         }
         return $data;
+    }
+
+    /*
+     * 直接写入缓存
+     */
+    public static function addCache($name = '', $data = '', $time = '2592000') {
+        return self::__cache_add($name, $data, $time);
     }
 
     /*
