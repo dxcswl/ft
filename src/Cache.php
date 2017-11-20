@@ -59,7 +59,9 @@ class Cache {
                 }else{
                     $ret_list = false;
                 }
-            } elseif($type == 3) {
+            }  elseif($type == 2 ){
+                $ret_list = self::__set_cache($name); //读取$name表中的数据 数据中包含 sort
+            }elseif($type == 3) {
                 $ret_list = self::__set_cache_sort($name); //读取$name表中的数据 数据中包含 sort
             }else {
                 \think\facade\Cache::remember($name, function() {
