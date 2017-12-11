@@ -564,21 +564,25 @@ class Core {
                         $vs[2] = $vs[3] . '.' . $vs[2];
                     }
                     if(($vs[1] == 'eq') or ($vs[1] == 'neq') or ($vs[1] == 'gt') or ($vs[1] == 'egt') or ($vs[1] == 'lt') or ($vs[1] == 'elt') or ($vs[1] == 'heq') or ($vs[1] == 'nheq')) {
-                        $arraynew[$vs[2]] = [$vs[1], $v]; //普通搜索
+                        $arraynew[] = [$vs[2],$vs[1], $v]; //普通搜索
                     } elseif($vs[1] == 'like') {
-                        $arraynew[$vs[2]] = ['like', '%' . $v . '%']; //模糊搜索
+                        $arraynew[] = [$vs[2],'like', '%' . $v . '%']; //模糊搜索
                     } elseif($vs[1] == 'time') { //区间时间搜索
                         $time = explode('->', $v);
-                        $arraynew[$vs[2]] = [['EGT', strtotime($time[0])], ['ELT', strtotime($time[1] . ' 23:59:59')]];
+                        if(count($time) > 1){
+                            $arraynew[] = [$vs[2],'EGT', strtotime($time[0]. ' 00:00:01')];
+                            $arraynew[] = [$vs[2],'ELT', strtotime($time[1]. ' 23:59:59')];
+                        }else{
+                            $arraynew[] = [$vs[2],'EGT', strtotime($time. ' 00:00:01')];
+                            $arraynew[] = [$vs[2],'ELT', strtotime($time. ' 23:59:59')];
+                        }
+
+
                     } elseif($vs[1] == 'gtlt') { //区间搜索
-                        if($vs[4]) {
-                            if($arraynew[$vs[2]]) {
-                                $arraynew[$vs[2]][1] = ['ELT', $v];
-                            } else {
-                                $arraynew[$vs[2]][] = ['ELT', $v];
-                            }
+                        if(isset($vs[4]) and $vs[4]) {
+                            $arraynew[] = [$vs[2],'ELT', $v];
                         } else {
-                            $arraynew[$vs[2]] = [['EGT', $v]];
+                            $arraynew[] = [$vs[2],'EGT', $v];
                         }
                     } elseif($vs[1] == 'between') { //区间搜索
                         if(isset($arraynew[$vs[2]]) and $arraynew[$vs[2]]) {
