@@ -18,7 +18,7 @@ namespace ft;
  */
 class Cache {
 
-    public static function Cache() {
+    function __construct(){
 
     }
 

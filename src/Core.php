@@ -104,6 +104,7 @@ class Core {
                 case 2:
                     $rand_number = rand(97, 122);
                     break; //小写字母
+                default:
             }
             $asc .= sprintf("%c", $rand_number);
         }
@@ -511,9 +512,9 @@ class Core {
             if(strlen(str_replace(' ', '', $v))) { //过滤空格
                 $v = trim($v);
                 $vs = explode('__', $key); //分割字符
-                if(($vs[0] == 'order') AND (count($vs) > 1)) { //是否是搜索条件和条件大于2
+                if(($vs[0] == 'order') && (count($vs) > 1)) { //是否是搜索条件和条件大于2
                     //处理业务
-                    if(isset($vs[2]) and $vs[2]) { //获取字段名  是否有联合查询
+                    if(isset($vs[2]) && $vs[2]) { //获取字段名  是否有联合查询
                         $vs[1] .= $vs[2] . '.' . $vs[1];
                     }
                     if($v == 1) {
@@ -559,11 +560,11 @@ class Core {
             if(strlen(str_replace(' ', '', $v))) { //过滤空格
                 $vs = explode('__', $key); //分割字符
 
-                if(($vs[0] == 'so') AND (count($vs) > 2)) { //是否是搜索条件和条件大于2
-                    if(isset($vs[3]) and $vs[3]) { //获取字段名  是否有联合查询
+                if(($vs[0] == 'so') && (count($vs) > 2)) { //是否是搜索条件和条件大于2
+                    if(isset($vs[3]) && $vs[3]) { //获取字段名  是否有联合查询
                         $vs[2] = $vs[3] . '.' . $vs[2];
                     }
-                    if(($vs[1] == 'eq') or ($vs[1] == 'neq') or ($vs[1] == 'gt') or ($vs[1] == 'egt') or ($vs[1] == 'lt') or ($vs[1] == 'elt') or ($vs[1] == 'heq') or ($vs[1] == 'nheq')) {
+                    if(($vs[1] == 'eq') || ($vs[1] == 'neq') || ($vs[1] == 'gt') || ($vs[1] == 'egt') || ($vs[1] == 'lt') || ($vs[1] == 'elt') || ($vs[1] == 'heq') || ($vs[1] == 'nheq')) {
                         $arraynew[] = [$vs[2],$vs[1], $v]; //普通搜索
                     } elseif($vs[1] == 'like') {
                         $arraynew[] = [$vs[2],'like', '%' . $v . '%']; //模糊搜索
@@ -579,13 +580,13 @@ class Core {
 
 
                     } elseif($vs[1] == 'gtlt') { //区间搜索
-                        if(isset($vs[4]) and $vs[4]) {
+                        if(isset($vs[4]) && $vs[4]) {
                             $arraynew[] = [$vs[2],'ELT', $v];
                         } else {
                             $arraynew[] = [$vs[2],'EGT', $v];
                         }
                     } elseif($vs[1] == 'between') { //区间搜索
-                        if(isset($arraynew[$vs[2]]) and $arraynew[$vs[2]]) {
+                        if(isset($arraynew[$vs[2]]) && $arraynew[$vs[2]]) {
                             $arraynew[$vs[2]][1][] = $v;
                         } else {
                             $arraynew[$vs[2]] = ['between', [$v]];
@@ -644,7 +645,7 @@ class Core {
 
     public static function hxSetTxt($txt, $file = 'pay') {
         $files = 'uploads/log/' . $file . '/' . date("Y-m-d") . '.txt';
-        $myfile = fopen($files, "a+") or die("无法打开文件!");
+        $myfile = fopen($files, "a+") || die("无法打开文件!");
         fwrite($myfile, date("Y-m-d H:i:s") . ' : ' . $txt . "\r\n");
         fclose($myfile);
     }
