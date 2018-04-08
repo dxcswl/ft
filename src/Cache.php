@@ -18,7 +18,7 @@ namespace ft;
  */
 class Cache {
 
-    function __construct(){
+    function __construct() {
 
     }
 
@@ -41,33 +41,33 @@ class Cache {
             } else {
                 $ret_list = self::__set_cache($name); //加载表中数据
             }
-        } else {
-            if($type == 1) {
-                $require = require_once(\think\facade\Env::get('app_path') . 'common/common/Cache.php');
-                if($require) {
-                    $array = explode('-', $name);
-                    if(empty($array[1]) != true) {
-                        $parameters = $array[1];
-                    }
-                    $name = $array[0];
-                    $Cache = new \common\common\Cache;
-                    if(method_exists($Cache, $name)) {
-                        $ret_list = $Cache->$name($parameters);
-                    } else {
-                        $ret_list = false;
-                    }
+        } else if($type == 1) {
+            $require = require_once(\think\facade\Env::get('app_path') . 'common/common/Cache.php');
+            if($require) {
+                $array = explode('-', $name);
+                if(empty($array[1]) != true) {
+                    $parameters = $array[1];
+                }else{
+                    $parameters = 0;
+                }
+                $method = $array[0];
+                $Cache = new \common\common\Cache;
+                if(method_exists($Cache, $method)) {
+                    $ret_list = $Cache->$method($parameters);
                 } else {
                     $ret_list = false;
                 }
-            } elseif($type == 2) {
-                $ret_list = self::__set_cache($name); //读取$name表中的数据 数据中包含 sort
-            } elseif($type == 3) {
-                $ret_list = self::__set_cache_sort($name); //读取$name表中的数据 数据中包含 sort
             } else {
-                \think\facade\Cache::remember($name, function() {
-                    return false;
-                });
+                $ret_list = false;
             }
+        } else if($type == 2) {
+            $ret_list = self::__set_cache($name); //读取$name表中的数据
+        } else if($type == 3) {
+            $ret_list = self::__set_cache_sort($name); //读取$name表中的数据 数据中包含 sort
+        } else {
+            \think\facade\Cache::remember($name, function() {
+                return false;
+            });
         }
         return self::__cache_add($name, $ret_list);
     }
@@ -115,6 +115,21 @@ class Cache {
     public static function addCache($name = '', $data = '', $time = 86400) {
         return self::__cache_add($name, $data, $time);
     }
+
+    /*
+ * 追加数据
+ */
+    public static function incCache($name = '', $number = 1) {
+        return \think\facade\Cache::inc($name, $number);
+    }
+
+    /*
+* 自减数据
+*/
+    public static function decCache($name = '', $number = 1) {
+        return \think\facade\Cache::dec($name, $number);
+    }
+
 
     /*
      *  删除缓存
