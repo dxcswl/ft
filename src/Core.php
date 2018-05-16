@@ -688,9 +688,12 @@ class Core {
     }
 
     public static function hxSetTxt($txt, $file = 'pay') {
+        if(is_array($txt)){
+            $txt = json_encode($txt,true);
+        }
         $files = 'uploads/log/' . $file . '/' . date("Y-m-d") . '.txt';
         $myfile = fopen($files, "a+") || die("无法打开文件!");
-        fwrite($myfile, date("Y-m-d H:i:s") . ' : ' . $txt . "\r\n");
+        @fwrite($myfile, date("Y-m-d H:i:s") . ' : ' . $txt . "\r\n");
         fclose($myfile);
     }
 }
