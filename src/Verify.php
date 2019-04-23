@@ -2,9 +2,9 @@
 // +----------------------------------------------------------------------
 // | Future [ 追寻最初的梦想 ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2010-2014 http://www.21514.com All rights reserved.
+// | Copyright (c) 2010-2019 www.21514.com All rights reserved.
 // +----------------------------------------------------------------------
-// | Author:  封疆 <dxcswl@163.com> QQ:84111804
+// | Author:Future <dxcswl@163.com> QQ:84111804
 // +----------------------------------------------------------------------
 
 namespace ft;
@@ -13,7 +13,7 @@ class Verify {
     /**
      * 是否为空值
      */
-    private function isEmpty($str = false) {
+    public static function isEmpty($str = false) {
         $str = trim($str);
         return !empty($str) ? true : false;
     }
