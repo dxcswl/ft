@@ -696,6 +696,59 @@ class Core {
         @fwrite($myfile, date("Y-m-d H:i:s") . ' : ' . $txt . "\r\n");
         fclose($myfile);
     }
+
+    /*
+     * 用于阿里云 HMAC-SHA1 1.0
+     */
+    public static function hxSignature($params, $accessKeySecret){
+		ksort($params);
+		$sortedQueryStringTmp = "";
+		foreach ($params as $key => $value) {
+			$sortedQueryStringTmp .= "&" . self::percentEncode($key) . "=" . self::percentEncode($value);
+		}
+		$stringToSign = "GET&%2F&" . self::percentEncode(substr($sortedQueryStringTmp, 1));
+		$sign = base64_encode(hash_hmac("sha1", $stringToSign, $accessKeySecret . "&",true));
+		$signature = self::percentEncode($sign);
+		return ['signature'=>$signature,'sortedQueryString'=>$sortedQueryStringTmp];
+	}
+
+	protected static function percentEncode($str) {
+		// 使用urlencode编码后，将"+","*","%7E"做替换即满足ECS API规定的编码规范
+		$res = urlencode($str);
+		$res = preg_replace("/\+/", "%20", $res);
+		$res = preg_replace("/\*/", "%2A", $res);
+		$res = preg_replace("/%7E/", "~", $res);
+		return $res;
+	}
+
+	/*
+	 *
+	 */
+	public static function hxAliCurlGet($url, $param = []) {
+		if(is_array($param) && count($param) > 0) {
+			$p = http_build_query($param);
+			$url = $url . '?' . $p;
+		}
+
+		if(function_exists("curl_init")) {
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, ["x-sdk-client" => "php/2.0.0"]);
+			$rtn = curl_exec($ch);
+
+			if($rtn === false) {
+				trigger_error("[CURL_" . curl_errno($ch) . "]: " . curl_error($ch), E_USER_ERROR);
+			}
+			curl_close($ch);
+
+			return $rtn;
+		}
+		$context = stream_context_create(["http" => ["method" => "GET", "header" => ["x-sdk-client: php/2.0.0"],]]);
+		return file_get_contents($url, false, $context);
+	}
+
 }
 
 ?>
